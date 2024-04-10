@@ -1,0 +1,34 @@
+import requests
+
+# Function to fetch repositories
+def get_repositories(repo_type):
+    url = f"https://<YOUR_ARTIFACTORY_URL>/artifactory/api/repositories?type={repo_type}"
+    response = requests.get(url, auth=("<USERNAME>", "<API_KEY_OR_PASSWORD>"))
+    repositories = response.json()
+    return repositories
+
+# Function to check and write repositories with xrayIndex false to a file
+def check_and_write(repositories):
+    with open("repositories_with_xrayIndex_false.txt", "w") as file:
+        for repo in repositories:
+            repo_config = get_repository_config(repo["key"])
+            xray_index = repo_config.get("xrayIndex", None)
+            if xray_index is not None and not xray_index:
+                file.write(f"{repo['key']}\n")
+
+# Function to get repository configuration
+def get_repository_config(repo_key):
+    url = f"https://<YOUR_ARTIFACTORY_URL>/artifactory/api/repositories/{repo_key}"
+    response = requests.get(url, auth=("<USERNAME>", "<API_KEY_OR_PASSWORD>"))
+    repo_config = response.json()
+    return repo_config
+
+# Main function
+def main():
+    remote_repositories = get_repositories("remote")
+    federated_repositories = get_repositories("federated")
+    check_and_write(remote_repositories + federated_repositories)
+    print("List of repositories with xrayIndex set to false written to repositories_with_xrayIndex_false.txt")
+
+if __name__ == "__main__":
+    main()
