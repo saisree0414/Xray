@@ -1,0 +1,43 @@
+import requests
+import json
+
+def validate_xray_index(repo_name, base_url, username, password):
+    url = f"{base_url}/api/repositories/{repo_name}/xray"
+    response = requests.get(url, auth=(username, password))
+    if response.status_code == 200:
+        xray_config = response.json()
+        return xray_config.get('xrayIndex', False)
+    else:
+        print(f"Failed to fetch Xray configuration for repository {repo_name}: {response.status_code}")
+        return None
+
+def write_repo_list_with_xray_disabled(repos_with_xray_disabled):
+    with open("repositories_with_xray_disabled.txt", "w") as file:
+        for repo in repos_with_xray_disabled:
+            file.write(repo + "\n")
+
+def main():
+    base_url = "YOUR_ARTIFACTORY_URL"
+    username = "YOUR_USERNAME"
+    password = "YOUR_PASSWORD"
+    repositories_file = "repositories_list.txt"
+
+    with open(repositories_file, "r") as file:
+        repositories = file.readlines()
+    
+    repos_with_xray_disabled = []
+
+    for repo in repositories:
+        repo_name = repo.strip()
+        xray_index_enabled = validate_xray_index(repo_name, base_url, username, password)
+        if xray_index_enabled is not True:
+            repos_with_xray_disabled.append(repo_name)
+
+    if repos_with_xray_disabled:
+        write_repo_list_with_xray_disabled(repos_with_xray_disabled)
+        print("Repositories with Xray index disabled have been written to repositories_with_xray_disabled.txt")
+    else:
+        print("All repositories have Xray index enabled.")
+
+if __name__ == "__main__":
+    main()
