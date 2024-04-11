@@ -1,12 +1,10 @@
 import requests
 import csv
 
-def get_repo_configuration(base_url, api_key, repo_key):
-    headers = {
-        'X-JFrog-Art-Api': api_key
-    }
+def get_repo_configuration(base_url, username, password, repo_key):
+    auth = (username, password)
     url = f"{base_url}/artifactory/api/repositories/{repo_key}"
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, auth=auth)
     if response.status_code == 200:
         return response.json()
     else:
@@ -21,19 +19,18 @@ def write_to_csv(repo_config, csv_file):
 
 def main():
     base_url = 'YOUR_ARTIFACTORY_BASE_URL'
-    api_key = 'YOUR_API_KEY'
+    username = 'YOUR_USERNAME'
+    password = 'YOUR_PASSWORD'
 
     # Fetching all repositories
-    headers = {
-        'X-JFrog-Art-Api': api_key
-    }
+    auth = (username, password)
     url = f"{base_url}/artifactory/api/repositories"
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, auth=auth)
     if response.status_code == 200:
         repositories = response.json()
         for repo in repositories:
             if repo['type'] in ['remote', 'federated']:
-                repo_config = get_repo_configuration(base_url, api_key, repo['key'])
+                repo_config = get_repo_configuration(base_url, username, password, repo['key'])
                 if repo_config:
                     csv_file = f"{repo['key']}_config.csv"
                     write_to_csv(repo_config, csv_file)
