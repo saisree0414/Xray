@@ -1,0 +1,31 @@
+import requests
+
+def get_repositories(base_url, username, password):
+    url = f"{base_url}/api/repositories?type=remote&type=federated"
+    response = requests.get(url, auth=(username, password))
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"Failed to fetch repositories: {response.status_code}")
+        return None
+
+def write_repo_list_with_xray_disabled(repositories):
+    with open("repositories_with_xray_disabled.txt", "w") as file:
+        for repo in repositories:
+            if not repo.get('xrayIndex', False):
+                file.write(repo['key'] + "\n")
+
+def main():
+    base_url = "YOUR_ARTIFACTORY_URL"
+    username = "YOUR_USERNAME"
+    password = "YOUR_PASSWORD"
+
+    repositories = get_repositories(base_url, username, password)
+    if repositories:
+        write_repo_list_with_xray_disabled(repositories)
+        print("Repository list with Xray index disabled has been written to repositories_with_xray_disabled.txt")
+    else:
+        print("No remote or federated repositories found.")
+
+if __name__ == "__main__":
+    main()
