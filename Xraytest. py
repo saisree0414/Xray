@@ -1,0 +1,38 @@
+import requests
+
+# Function to fetch remote and federated repositories from JFrog Artifactory
+def get_remote_and_federated_repositories(base_url, username, password):
+    url = f"{base_url}/api/repositories?type=remote&type=federated"
+    response = requests.get(url, auth=(username, password))
+    repositories = response.json()
+    return repositories
+
+# Function to check if Xray index is enabled for a repository
+def is_xray_index_enabled(base_url, repo_key, username, password):
+    url = f"{base_url}/api/repositories/{repo_key}/xray"
+    response = requests.get(url, auth=(username, password))
+    xray_config = response.json()
+    return xray_config.get('xrayIndex', False)
+
+# Function to write repository list with Xray index disabled to a file
+def write_repo_list_with_xray_disabled(repositories):
+    with open("repositories_with_xray_disabled.txt", "w") as file:
+        for repo in repositories:
+            if not repo['xrayIndex']:
+                file.write(repo['key'] + "\n")
+
+# Main function
+def main():
+    base_url = "YOUR_ARTIFACTORY_URL"
+    username = "YOUR_USERNAME"
+    password = "YOUR_PASSWORD"
+
+    repositories = get_remote_and_federated_repositories(base_url, username, password)
+    if repositories:
+        write_repo_list_with_xray_disabled(repositories)
+        print("Repository list with Xray index disabled has been written to repositories_with_xray_disabled.txt")
+    else:
+        print("No remote or federated repositories found.")
+
+if __name__ == "__main__":
+    main()
