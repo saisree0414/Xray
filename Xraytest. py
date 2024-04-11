@@ -1,3 +1,7 @@
+#jfrog rt curl /api/repositories?xrayIndex=false | jq -r '.[] | .key'
+
+
+
 import requests
 
 # Function to fetch remote and federated repositories from JFrog Artifactory
