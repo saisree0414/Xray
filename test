@@ -1,0 +1,15 @@
+select name from watches where active = 1;
+    for row in rows:
+         select count(*),target,watcher_name from public.user_issues where watcher_name = row[name] group by target,watcher_name;
+               --watcher_name='gyqv-maven-violation-watch'
+         for row in rows
+              --Insert into verizon.user_violation_watch_count
+                 --Ignore the below step if its a cache repo
+                          SELECT distinct sha256, issue_id as XRAYID, path as RepoFullPath, target as RepoName,
+                                      watcher_id, watcher_name, severity
+                              FROM public.user_issues where target like row[target]
+                                             --target 	 '%gyqv-maven-violation-cpu-validation%';
+                           --IF Target contains -prod in repo name
+                                  -- Insert into verizon.user_violation_prod_Details
+                           --ELSE
+                                  -- Insert into verizon.user_violation_Details
