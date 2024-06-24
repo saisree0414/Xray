@@ -13,3 +13,5 @@ select name from watches where active = 1;
                                   -- Insert into verizon.user_violation_prod_Details
                            --ELSE
                                   -- Insert into verizon.user_violation_Details
+
+select repo_name, vsad_name ,portfolio ,file_count ,size_in_gb ,updated_date  from public.vw_repo_file_size_info_daily order by size_in_gb::int desc;
